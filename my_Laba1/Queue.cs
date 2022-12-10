@@ -5,12 +5,14 @@ public class Queue
     private Item head = null;
     private Item tail = null;
     public int size = 0;
-    public static int N_op = 0;
+    public static ulong N_op = 0;
 
     //добавляет в конец списка новый эл-т
     public void Push(int value) // 7
     {
+        N_op += 7;
         Item item = new Item(value, null); // 1
+        
         if (head == null) // 2
         {
             head = item;
@@ -28,6 +30,7 @@ public class Queue
 
     public int Pop() // 6
     {
+        N_op += 6;
         if (head == null)
         {
             throw new Exception("Queue is empty!!!");
@@ -44,14 +47,19 @@ public class Queue
     // 345
     public int Get(int index) // 2 + n/2 * (13 + 2) + 2 + n/2 * (13 + 2) +  1 + 1 = 6 + n * 15
     {
+        N_op += 2;
+        N_op += 2;
         for (int i = 0; i < index; i++) // 2 + n/2 * (13 + 2)
         {
+            N_op += 2;
             Push(Pop()); // 13
         }
-
+        
         int val = head.value; // 1
+        N_op += 2;
         for (int i = index; i < size; i++) //  2 + n/2 * (13 + 2)
         {
+            N_op += 2;
             Push(Pop()); // 13
         }
 
@@ -61,14 +69,19 @@ public class Queue
 
     public void Set(int index, int newValue) // 2 + n/2 * (13 + 2) + 2 + n/2 * (13 + 2) + 1 = 5 + n * 15
     {
+        N_op += 1;
+        N_op += 2;
         for (int i = 0; i < index; i++) // 2 + n/2 * (13 + 2)
         {
+            N_op += 2;
             Push(Pop());
         }
-
+    
         head.value = newValue; // 1
+        N_op += 2;
         for (int i = index; i < size; i++) // 2 + n/2 * (13 + 2)
         {
+            N_op += 2;
             Push(Pop());
         }
     }
@@ -86,7 +99,7 @@ public class Queue
         Console.WriteLine();
     }
 
-    public int GetNop()
+    public ulong GetNop()
     {
         return N_op;
     }

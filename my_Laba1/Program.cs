@@ -1,33 +1,44 @@
-﻿namespace my_Laba1
+﻿using System.Diagnostics;
+
+namespace my_Laba1
 {
     internal class Program
     {
 
-        public static int N_op = 0;
+        public static ulong N_op = 0;
 
         static void Main(string[] args)
         {
             Queue queue = new Queue();
+            Random rand = new Random();
 
 
-            queue.Push(1);
-            queue.Push(4);
-            queue.Push(5);
-            queue.Push(7);
-            queue.Push(0);
-            queue.Push(8);
+
+            for (int i = 1; i <= 10; i++)
+            {
+                Stopwatch stopwatch = new Stopwatch();
+                for (int j = 0; j < 300; j++)
+                {
+                    queue.Push(rand.Next(1, 3000));
+                }
+                stopwatch.Start();
+                insSort(queue);
+                stopwatch.Stop();
+                Console.WriteLine($"Номер сортировки: {i} Количество отсортированных элементов: {queue.size} " +
+                                  $"Время сортировки(ms): {stopwatch.ElapsedMilliseconds} " +
+                                  $"Количество операций (N_op): {N_op + queue.GetNop()}");
+            }
+
             
-            queue.Print();
 
-
-            insSort(queue);
             
-            queue.Print();
+
             Console.ReadLine();
         }
         
         static void Swap(Queue deck, int i, int j) // 1 + 5 + n * 15 + 11 + 30n = 17 + 45n
         {
+            N_op += 1;
             var temp = deck.Get(i); // 1
             deck.Set(i, deck.Get(j)); // 5 + n * 15 + 6 + n * 15 = 11 + 30n
             deck.Set(j, temp); // 5 + n * 15
@@ -35,45 +46,47 @@
         }
         
 
-        static void insSort(Queue queue)
+        static void insSort(Queue queue) // 2 + n * (log2(n) * (12 + 15n) + 1 + 17(n/2)^2 + 45n(n/2)^2) = 2 + 15n^2log(n) + 12nlog(n) + 7n + 45/4
         {
             int j, k;
 
-            for (int i = 1; i < queue.size; i++)
+            for (int i = 1; i < queue.size; i++) // 2 + n * (log2(n) * (12 + 15n) + 1 + 17(n/2)^2 + 45n(n/2)^2)
             {
-                j = i - 1;
-                k = binSearch(queue, queue.Get(i), 0, j);
+                N_op += 1;
+                k = binSearch(queue, queue.Get(i), 0, i); // log2(n) * (12 + 15n) + 1
 
-                
-                for (int m = j; m >= k; m--)
+                N_op += 2;
+                for (int m = i; m > k; m--) // (n/2)^2 * (17 + 45n) = 17(n/2)^2 + 45n(n/2)^2
                 {
-                    Swap(queue, m, m + 1);
-                    queue.Print();
+                    N_op += 2;
+                    Swap(queue, m - 1, m); // 17 + 45n
                 }
             }
 
 
 
-        } // 52314
-
-        public static int binSearch(Queue queue, int key, int l, int r)
+        }
+        public static int binSearch(Queue queue, int key, int l, int r) // log2(n) * (12 + 15n) + 1
         {
             int m;
-
-            while (l < r - 1)
+            
+            while (l <= r) // log2(n) * (3 + 9 + 15n) + 1 = log2(n) * (12 + 15n)
             {
-                m = (l + r) / 2;
-                if (queue.Get(m) < key)
+                N_op += 3; 
+                m = (l + r) / 2; // 3
+                N_op += 2;
+                if (queue.Get(m) < key) // 6 + n * 15 + 1 + 2 = 9 + 15n
                 {
-                    l = m;
+                    l = m + 1;
                 }
                 else
                 {
                     r = m - 1;
                 }
-            } // 0  3 2 5  2
+            }
 
-            return r;
+            N_op += 1;
+            return l; // 1
         }
 
 
